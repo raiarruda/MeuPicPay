@@ -32,27 +32,19 @@ class BalanceController extends Controller
 	    return view('admin.balance.transfer-to');
     }
     public function transfer(Request $request, User $user){
+
 	    $sendTo = $user->getSender($request->sendTo);
-    	return view ('admin.balance.transfer', compact('sendTo'));
+
+
+	    if($sendTo) {
+		    return view ('admin.balance.transfer', compact('sendTo'));
+	    }
+
+	    return redirect()
+		    ->back()
+		    ->with('error', 'não encontrado');
 
     }
-    public function transferConfirm(Request $request){
-
-
-	    //parte 2 ->  sacar na conta origem
-
-	    $balanceOrigem = auth()->user()->balance;
-	    // $responseOrigem = $balanceOrigem->withdraw($request->valor);
-
-	    //parte 1 -> depositar na conta destino
-		$userDestino =User::find($request->sendTo);
-
-	    $balanceDestino = $userDestino->balance;
-	    $responseDestino = $balanceDestino->deposit($request->valor);
-
-	    dd($responseDestino);
-    }
-
 
 
 
@@ -60,7 +52,6 @@ class BalanceController extends Controller
 	    $balance = auth()->user()->balance()->firstOrCreate([]);
 		$response = $balance->deposit($request->valor);
 		if($response['success']) {
-			echo "oi";
 
 			return redirect()
 				->route('admin.balance')
@@ -74,11 +65,10 @@ class BalanceController extends Controller
     }
 
     public function transferStore(MoneyValidationForm $request, User $user){
+
     	$user = $user->find($request->sendTo);
-	    $balance = $user->balance()->firstOrCreate([]);
-
+	    $balance = auth()->user()->balance()->firstOrCreate([]);
 	    $response = $balance->transfer($request->valor, $user);
-
 
 
 		if($response['success']) {

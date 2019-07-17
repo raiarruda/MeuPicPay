@@ -17,7 +17,7 @@ return [
 
 	/*
 	|--------------------------------------------------------------------------
-	| Database Connections
+	| Database Connectionshero
 	|--------------------------------------------------------------------------
 	|
 	| Here are each of the database connections setup for your application.

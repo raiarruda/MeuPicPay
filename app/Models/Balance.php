@@ -96,12 +96,76 @@ class Balance extends Model {
 
 	}
 
-	public function transfer($value, $user){
-		echo "dentro de transfer";
-		$user = $user->balance->deposit($value);
-		$user2 = auth()->user()->balance->withdraw($value);
-		dd($user,$user2);
+	public function transfer($value, $user) {
 
+		if ($this->amount < $value)
+			return [
+				'success' => FALSE,
+				'message' => 'Saldo insuficiente para transferencia'
+			];
+
+		DB::beginTransaction();
+		/* *
+		Atualiza saldo do remetente
+		 * */
+
+		$totalBefore = $this->amount ? $this->amount : 0;
+
+		$valueFormated = number_format($value, 2, '.', '');
+		$this->amount -= $valueFormated;
+		$totalAfter = $this->amount;
+		$transfer = $this->save();
+
+
+		$historic = auth()
+			->user()
+			->historics()
+			->create([
+				         'type'                => 'T',
+				         'amount'              => $value,
+				         'total_before'        => $totalBefore,
+				         'total_after'         => $totalAfter,
+				         'date'                => date('Ymd'),
+				         'user_id_transaction' => $user->id
+			         ]);
+		/* *
+		Atualiza saldo do recebidor
+		 * */
+
+		$balanceSendTo =  $user->balance()->firstOrCreate([]);
+		$totalBeforeSendTo = $balanceSendTo->amount ? $balanceSendTo->amount : 0;
+		$balanceSendTo->amount += $valueFormated;
+		$totalAfterSendTo = $balanceSendTo->amount;
+		$transferSendTo = $balanceSendTo->save();
+
+		$historicSendTo = $user
+			->historics()
+			->create([
+				         'type'                => 'I',
+				         'amount'              => $value,
+				         'total_before'        => $totalBeforeSendTo,
+				         'total_after'         => $totalAfterSendTo,
+				         'date'                => date('Ymd'),
+				         'user_id_transaction' => auth()->user()->id
+			         ]);
+
+		if ($transfer && $historic && $historicSendTo && $transferSendTo){
+			DB::commit();
+
+			return [
+				'success' => TRUE,
+				'message' => "O valor de R$ {$valueFormated} foi transferido."
+			];
+		} else {
+			DB::rollback();
+			echo "rollback";
+			return [
+				'success' => TRUE,
+				'message' => "Falha ao transferir no valor de R$ {$valueFormated}."
+			];
+
+		}
 
 	}
+
 }

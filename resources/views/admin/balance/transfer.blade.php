@@ -19,7 +19,7 @@
 		</div>
 		<div class="box-body">
 			@include('admin.includes.alerts')
-			<p>Transferir para {{ $sendTo }}</p>
+			<p>Transferir para {{ $sendTo->name }}</p>
 			<form class="form-inline" action="{{ route('transfer.store')}}" method="post">
 				{!! csrf_field() !!}
 				<input  type="hidden" name="sendTo" value="{{ $sendTo->id }}">
