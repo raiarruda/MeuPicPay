@@ -1,5 +1,11 @@
 <?php
 
+define('RDS_HOSTNAME', $_SERVER['RDS_HOSTNAME']);
+define('RDS_USERNAME', $_SERVER['RDS_USERNAME']);
+define('RDS_PASSWORD', $_SERVER['RDS_PASSWORD']);
+define('RDS_DB_NAME', $_SERVER['RDS_DB_NAME']);
+define('RDS_PORT', $_SERVER['RDS_PORT']);
+
 return [
 
 	/*
@@ -39,8 +45,24 @@ return [
 			'database' => env('DB_DATABASE', database_path('database.sqlite')),
 			'prefix'   => '',
 		],
-
+            
 		'mysql' => [
+			'driver'      => 'mysql',
+			'host'        => RDS_HOSTNAME,
+			'port' => RDS_PORT,
+            'database' => RDS_DB_NAME,
+            'username' => RDS_USERNAME,
+            'password' => RDS_PASSWORD,
+			'unix_socket' => env('DB_SOCKET', ''),
+			'charset'     => 'utf8mb4',
+			'collation'   => 'utf8mb4_unicode_ci',
+			'prefix'      => '',
+			'strict'      => TRUE,
+			'engine'      => 'InnoDB'
+			,
+		],
+		
+	/*'mysql' => [
 			'driver'      => 'mysql',
 			'host'        => env('DB_HOST', '127.0.0.1'),
 			'port'        => env('DB_PORT', '3306'),
@@ -55,7 +77,7 @@ return [
 			'engine'      => 'InnoDB'
 			,
 		],
-
+*/
 		'pgsql' => [
 			'driver'   => 'pgsql',
 			'host'     => env('DB_HOST', 'ec2-23-21-160-38.compute-1.amazonaws.com'),
