@@ -48,11 +48,11 @@ return [
             
 		'mysql' => [
 			'driver'      => 'mysql',
-			'host'        => 'aaagejnbodkmh0.c16qkuk1yux5.us-west-2.rds.amazonaws.com',
-			'port' => '3306',
-            'database' => 'aaagejnbodkmh0',
-            'username' => 'ebroot',
-            'password' => 'ebsenhadb',
+			'host'        => RDS_HOSTNAME,
+			'port' => RDS_PORT,
+            'database' => RDS_DB_NAME,
+            'username' => RDS_USERNAME,
+            'password' => RDS_PASSWORD,
 			'unix_socket' => env('DB_SOCKET', ''),
 			'charset'     => 'utf8mb4',
 			'collation'   => 'utf8mb4_unicode_ci',
